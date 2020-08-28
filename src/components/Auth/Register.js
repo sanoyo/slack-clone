@@ -19,6 +19,7 @@ class Register extends React.Component {
     password: "",
     passwordConfirmation: "",
     errors: [],
+    loading: false,
   };
 
   isFormValid = () => {
@@ -29,7 +30,7 @@ class Register extends React.Component {
       error = { message: ' Fill in all Fields' }
       this.setState({ errors: errors.concat(error) })
       return false
-    } else if (this.isPasswordValid(this.state)) { // password
+    } else if (!this.isPasswordValid(this.state)) { // password
       error = { message: 'Password is Invalid' }
       this.setState({ errors: errors.concat(error) })
       return false
@@ -59,25 +60,37 @@ class Register extends React.Component {
   };
 
   handleSubmit = event => {
+    // リンク先への遷移を抑制
+    event.preventDefault();
+    this.setState({ errors: [], loading: true });
+
     // validation
-    if (this.isFormValid()) {
-      // リンク先への遷移を抑制
-      event.preventDefault();
+    if (this.isFormValid()) {  
 
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
           console.log(createdUser);
+          this.setState({ loading: false });
         })
         .catch(err => {
           console.error(err);
+          this.setState({ errors: this.state.errors.concat(err) ,loading : false });
         })
     }
   }
 
+  handleInputError = (errors, InputName) => {
+    return errors.some(error =>
+      error.message.toLowerCase().includes(InputName)
+    )
+    ? "error"
+    : ""
+  }
+
   render() {
-    const { username, email, password, passwordConfirmation, errors } = this.state;
+    const { username, email, password, passwordConfirmation, errors, loading } = this.state;
     
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
@@ -96,6 +109,7 @@ class Register extends React.Component {
                 placeholder="Username"
                 onChange={this.handleChange}
                 value={username}
+                className={this.handleInputError(errors, 'username')}
                 type="text"
               />
 
@@ -107,6 +121,7 @@ class Register extends React.Component {
                 placeholder="Email Address"
                 onChange={this.handleChange}
                 value={email}
+                className={this.handleInputError(errors, 'email')} // className を error にするとそのフィールドの色が赤くなる
                 type="email"
               />
 
@@ -118,6 +133,7 @@ class Register extends React.Component {
                 placeholder="Password"
                 onChange={this.handleChange}
                 value={password}
+                className={this.handleInputError(errors, 'password')}
                 type="password"
               />
 
@@ -129,10 +145,11 @@ class Register extends React.Component {
                 placeholder="Password Confirmation"
                 onChange={this.handleChange}
                 value={passwordConfirmation}
+                className={this.handleInputError(errors, 'passwordConfirmation')}
                 type="password"
               />
 
-              <Button color="orange" fluid size="large">
+              <Button disabled={loading} className={loading ? 'loding': ''} color="orange" fluid size="large">
                 Submit
               </Button>
             </Segment>
