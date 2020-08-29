@@ -15,6 +15,11 @@ const user_reducer = (state = initialUserState, action) => {
       };
     default:
       return state;
+    case actionTypes.CLEAR_USER:
+      return {
+        ...initialUserState,
+        isLoading: false
+      }
   }
 };
 
