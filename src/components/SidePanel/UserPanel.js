@@ -19,7 +19,7 @@ class UserPanel extends React.Component {
     },
     {
       key: "signout",
-      text: <span onClick={this.signOut()}>Sign Out</span>
+      text: <span onClick={this.signOut}>Sign Out</span>
     }
   ];
 
