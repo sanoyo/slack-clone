@@ -57,7 +57,6 @@ class Messages extends React.Component {
         <MessagesHeader />
         <Segment>
           <Comment.Group className="messages">
-            {console.log(messages.length)}
             {this.displayMessages(messages)}
           </Comment.Group>
         </Segment>
